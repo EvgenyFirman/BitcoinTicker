@@ -3,7 +3,7 @@
 
 import UIKit
 
-class ViewController: UIViewController , UIPickerViewDataSource, UIPickerViewDelegate
+class ViewController: UIViewController , UIPickerViewDataSource, UIPickerViewDelegate, CoinManagerDelegate
 {
   // Initializing IBO Outlets
     @IBOutlet weak var bitcoinLabel: UILabel!
@@ -11,7 +11,7 @@ class ViewController: UIViewController , UIPickerViewDataSource, UIPickerViewDel
     @IBOutlet weak var currencyPicker: UIPickerView!
     
     // Initializing coinManager structure
-    let coinManager = CoinManager()
+    var coinManager = CoinManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,6 +19,7 @@ class ViewController: UIViewController , UIPickerViewDataSource, UIPickerViewDel
         currencyPicker.dataSource = self
         
         currencyPicker.delegate = self
+        coinManager.delegate = self
     }
     
     // Add delegate method pickerView
@@ -28,7 +29,9 @@ class ViewController: UIViewController , UIPickerViewDataSource, UIPickerViewDel
     
     // Add delegate method for pickerView
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        print(row)
+        let currencyLiteral = coinManager.currencyArray[row]
+        
+        coinManager.getCoinPrice(for: currencyLiteral)
     }
     
     // Add function which return number of components
@@ -42,6 +45,13 @@ class ViewController: UIViewController , UIPickerViewDataSource, UIPickerViewDel
         return coinManager.currencyArray.count
     }
     
+    // Delegate function
+    func didUpdateView(_ result: CurrencyStruct) {
+        DispatchQueue.main.async {
+            self.bitcoinLabel.text = String(format:"%.1f",result.currencyRate)
+            self.currencyLabel.text = result.currencyName
+        }
+    }
 
 
 }
